@@ -1,1 +1,8 @@
-name="personality-engine"\nmain="src/worker.ts"\ncompatibility_date="2024-01-01"
+account_id = "049ff5e84ecf636b53b162cbb580aae6"
+name = "personality-engine"
+main = "src/worker.ts"
+compatibility_date = "2024-01-01"
+
+[[kv_namespaces]]
+binding = "STATE"
+id = "29b507cd267f4dd784e5e03f00d0aa2e"
