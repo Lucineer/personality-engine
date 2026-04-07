@@ -1,47 +1,53 @@
 # personality-engine
 
-You don't build a good agent by pasting prompt blobs at the top of every file. 🧠
+You ever notice your agent forgets who it is every time you swap models? 🧠
 
-A unified personality system for agents in the Cocapn Fleet.
+Part of Cocapn Fleet. This is a unified personality system for repo-native agents. Store your agent's identity, tone, and boundaries in Cloudflare KV instead of scattered prompt files. Deploy once. Any agent you build can call this single source of truth, surviving model swaps and refactors.
+
+**Live reference:** [https://the-fleet.casey-digennaro.workers.dev/personality](https://the-fleet.casey-digennaro.workers.dev/personality)
 
 ---
 
-## Why this exists
-When you swap LLM models, debug an endpoint, or move code between repositories, your agent's personality often gets lost or inconsistent. Hardcoded prompts are fragile. This provides a stateful identity layer for your agents, separate from your application logic.
+## Why This Exists
 
-## What it does
-- **Stores personality as state** in Cloudflare KV, not as text appended to prompts.
-- **Provides a runtime service** your agents call to apply consistent identity, boundaries, and tone.
-- **Routes requests** across multiple configured LLM providers (DeepSeek, Moonshot, etc.) with automatic fallback if one is unavailable.
-- **Implements the Fleet protocol** with standard endpoints.
+You got tired of copying the same system prompt between repos. You updated an agent's tone, but half your deployments still used the old version. This centralizes the definition to stop the drift.
 
-## One limitation
-Your personality data is persisted to a Cloudflare KV namespace, which you must create and bind to your Worker during initial setup. It's not a complex step, but it is a manual one.
+---
+
+## What It Provides
+
+1.  **A service, not a library.** No SDK or imports. Make HTTP calls from any agent.
+2.  **Personality decoupled from models.** Switch LLM providers without rewriting behavior prompts.
+3.  **You own the instance.** Fork and deploy your own copy. No breaking upstream changes.
+
+---
+
+## Features
+
+*   **Stateful Personality**: Manage traits, backstory, and guardrails via simple API endpoints (`/api/seed`, `/api/chat`).
+*   **Multi-Provider Routing**: Routes requests to configured providers (DeepSeek, Moonshot, etc.) with sequential fallback.
+*   **Zero Dependencies**: One auditable `index.js` file.
+*   **Bring Your Own Keys**: Add only the API keys you use. No bundled accounts.
+*   **Fork-First Deployment**: You control the deployed instance and data.
+
+---
 
 ## Quick Start
-1.  Fork and clone this repository.
-2.  Run `npx wrangler deploy` from its directory.
-3.  Follow the instructions at your worker's `/setup` endpoint to bind a KV namespace and add API keys as secrets.
 
-## Architecture
-A single-file Cloudflare Worker. It sits as a service your agents call. It applies the stored personality—traits, tone, context, boundaries—to each request before routing it to an LLM. Personality survives deployments and model changes because it's kept in KV storage.
-
-## Key Features
-- **Multi-Provider Routing**: Uses configured LLM APIs (DeepSeek, Moonshot, DeepInfra, SiliconFlow) with fallback.
-- **Stateful Personality**: Managed via the `/api/seed` and `/api/chat` endpoints.
-- **Zero Dependencies**: The entire runtime is one auditable file.
-- **Bring Your Own Keys**: Add only the API keys you want to use.
-- **Fork-First**: You deploy and own your instance.
-
-## Live Reference
-A public deployment is available for testing:  
-[https://the-fleet.casey-digennaro.workers.dev/personality](https://the-fleet.casey-digennaro.workers.dev/personality)
+1.  **Fork** this repository.
+2.  **Deploy** with `npx wrangler deploy`.
+3.  **Configure**: Visit your worker's `/setup` endpoint. It will guide you to:
+    *   Bind a new KV namespace for personality storage.
+    *   Add your LLM API keys as secrets (e.g., `DEEPSEEK_API_KEY`).
 
 ---
 
-MIT License.  
-Superinstance & Lucineer (DiGennaro et al.).
+## A Measured Limitation
 
-<div align="center">
-  <a href="https://the-fleet.casey-digennaro.workers.dev">The Fleet</a> • <a href="https://cocapn.ai">Cocapn</a>
-</div>
+The system uses a single Cloudflare KV namespace for storage. Each namespace has a 25MB limit, which constrains the total size of all stored personality data and chat history across your agents.
+
+---
+
+MIT License.
+
+<div style="text-align:center;padding:16px;color:#64748b;font-size:.8rem"><a href="https://the-fleet.casey-digennaro.workers.dev" style="color:#64748b">The Fleet</a> &middot; <a href="https://cocapn.ai" style="color:#64748b">Cocapn</a></div>
