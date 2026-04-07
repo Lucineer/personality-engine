@@ -1,0 +1,12 @@
+{
+  "name": "personality-engine",
+  "type": "cocapn-vessel",
+  "version": "1.0.0",
+  "category": "concept",
+  "capabilities": [
+    "personality-management",
+    "vessel-profiling"
+  ],
+  "fleet": "https://the-fleet.casey-digennaro.workers.dev",
+  "cocapn": "https://cocapn.ai"
+}
