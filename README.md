@@ -1,54 +1,46 @@
 # personality-engine
 
-You build good agents. They should sound like themselves.
+You don't build a good agent by pasting prompt blobs at the top of every file. 🧠
 
-A unified personality system for repo-native agents in the Cocapn Fleet. It keeps your agent's tone consistent across model changes and conversation resets.
-
-### Try it live
-Reference fleet instance: https://the-fleet.casey-digennaro.workers.dev
+A unified personality system for agents in the Cocapn Fleet.
 
 ---
 
 ## Why this exists
-Agent implementations often rebuild personality logic from scratch. Tone drifts when you switch backend models, and identity fades across context windows. This is a shared layer that fixes that.
+When you swap LLM models, debug an endpoint, or move code between repositories, your agent's personality often gets lost or inconsistent. Hardcoded prompts are fragile. This provides a stateful identity layer for your agents, separate from your application logic.
 
 ## What it does
-- Runs on Cloudflare Workers. Cold starts are typically fast. No servers or databases.
-- Zero runtime dependencies. The entire codebase is minimal and easy to audit.
-- Personality is persisted state, not hardcoded prompt text. Traits survive model swaps and context resets.
-- Fork-first philosophy. There is no single canonical version. You own your copy.
+- **Stores personality as state** in Cloudflare KV, not as text appended to prompts.
+- **Provides a runtime service** your agents call to apply consistent identity, boundaries, and tone.
+- **Routes requests** across multiple configured LLM providers (DeepSeek, Moonshot, etc.) with automatic fallback if one is unavailable.
+- **Implements the Fleet protocol** with standard endpoints.
+
+## One limitation
+Your personality data is persisted to a Cloudflare KV namespace, which you must create and bind to your Worker during initial setup. It's not a complex step, but it is a manual one.
 
 ## Quick Start
-1.  Fork this repository: `gh repo fork Lucineer/personality-engine --clone`
-2.  Deploy to Cloudflare Workers: `cd personality-engine && npx wrangler deploy`
-3.  Add at least one LLM API key as a secret in the Cloudflare dashboard.
+1.  Fork and clone this repository.
+2.  Run `npx wrangler deploy` from its directory.
+3.  Follow the instructions at your worker's `/setup` endpoint to bind a KV namespace and add API keys as secrets.
 
-## How it works
-A Cloudflare Worker that provides a consistent personality layer for agents. It acts as a uniform interface to multiple LLM providers, ensuring agents maintain identity regardless of the underlying model handling a request.
+## Architecture
+A single-file Cloudflare Worker. It sits as a service your agents call. It applies the stored personality—traits, tone, context, boundaries—to each request before routing it to an LLM. Personality survives deployments and model changes because it's kept in KV storage.
 
-## Features
-- **Multi-Provider Fallback**: Routes requests across available API keys (DeepSeek, Moonshot, DeepInfra, SiliconFlow).
-- **Standard Endpoints**: Implements fleet-standard routes (`/health`, `/setup`, `/api/chat`, `/api/seed`).
-- **Stateful Personality**: Uses KV storage for persistent personality traits.
-- **Bring Your Own Key**: Use any supported LLM provider.
+## Key Features
+- **Multi-Provider Routing**: Uses configured LLM APIs (DeepSeek, Moonshot, DeepInfra, SiliconFlow) with fallback.
+- **Stateful Personality**: Managed via the `/api/seed` and `/api/chat` endpoints.
+- **Zero Dependencies**: The entire runtime is one auditable file.
+- **Bring Your Own Keys**: Add only the API keys you want to use.
+- **Fork-First**: You deploy and own your instance.
 
-## Current Limitation
-Only supports a fixed set of LLM providers. Adding a new one requires modifying the code.
-
-## BYOK Setup
-Visit your deployed worker's `/setup` endpoint for instructions. Add one or more of these secrets:
-- `DEEPSEEK_API_KEY`
-- `MOONSHOT_API_KEY`
-- `DEEPINFRA_API_KEY`
-- `SILICONFLOW_API_KEY`
-
-## Contributing
-This is an open fleet vessel. Fork the repository, make your improvements, and submit a pull request to share changes.
-
-## License
-MIT License © Superinstance & Lucineer (DiGennaro et al.).
+## Live Reference
+A public deployment is available for testing:  
+[https://the-fleet.casey-digennaro.workers.dev/personality](https://the-fleet.casey-digennaro.workers.dev/personality)
 
 ---
+
+MIT License.  
+Superinstance & Lucineer (DiGennaro et al.).
 
 <div align="center">
   <a href="https://the-fleet.casey-digennaro.workers.dev">The Fleet</a> • <a href="https://cocapn.ai">Cocapn</a>
