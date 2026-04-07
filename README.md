@@ -1,71 +1,55 @@
-<p align="center">
-  <img src="https://raw.githubusercontent.com/Lucineer/capitaine/master/docs/capitaine-logo.jpg" alt="Capitaine" width="120">
-</p>
+# personality-engine
 
-<h1 align="center">personality-engine</h1>
+You build good agents. They should sound like themselves.
 
-<p align="center">Unified personality system for repo-native agents.</p>
+A unified personality system for repo-native agents in the Cocapn Fleet. It keeps your agent's tone consistent across model changes and conversation resets.
 
-<p align="center">
-  <a href="https://github.com/Lucineer/personality-engine/issues">Issues</a> ·
-  <a href="#the-fleet">The Fleet</a>
-</p>
+### Try it live
+Reference fleet instance: https://the-fleet.casey-digennaro.workers.dev
 
 ---
 
-**Fleet service** · Powered by [Capitaine](https://github.com/Lucineer/capitaine) · [Cocapn](https://github.com/Lucineer/cocapn)
+## Why this exists
+Agent implementations often rebuild personality logic from scratch. Tone drifts when you switch backend models, and identity fades across context windows. This is a shared layer that fixes that.
 
-A cocapn fleet service running on Cloudflare Workers.
+## What it does
+- Runs on Cloudflare Workers. Cold starts are typically fast. No servers or databases.
+- Zero runtime dependencies. The entire codebase is minimal and easy to audit.
+- Personality is persisted state, not hardcoded prompt text. Traits survive model swaps and context resets.
+- Fork-first philosophy. There is no single canonical version. You own your copy.
 
 ## Quick Start
+1.  Fork this repository: `gh repo fork Lucineer/personality-engine --clone`
+2.  Deploy to Cloudflare Workers: `cd personality-engine && npx wrangler deploy`
+3.  Add at least one LLM API key as a secret in the Cloudflare dashboard.
 
-```bash
-gh repo fork Lucineer/personality-engine --clone
-cd personality-engine
-npx wrangler login
-npx wrangler deploy
-```
+## How it works
+A Cloudflare Worker that provides a consistent personality layer for agents. It acts as a uniform interface to multiple LLM providers, ensuring agents maintain identity regardless of the underlying model handling a request.
 
-## The Fleet
+## Features
+- **Multi-Provider Fallback**: Routes requests across available API keys (DeepSeek, Moonshot, DeepInfra, SiliconFlow).
+- **Standard Endpoints**: Implements fleet-standard routes (`/health`, `/setup`, `/api/chat`, `/api/seed`).
+- **Stateful Personality**: Uses KV storage for persistent personality traits.
+- **Bring Your Own Key**: Use any supported LLM provider.
 
+## Current Limitation
+Only supports a fixed set of LLM providers. Adding a new one requires modifying the code.
 
-<details>
-<summary><strong>⚓ The Fleet</strong></summary>
+## BYOK Setup
+Visit your deployed worker's `/setup` endpoint for instructions. Add one or more of these secrets:
+- `DEEPSEEK_API_KEY`
+- `MOONSHOT_API_KEY`
+- `DEEPINFRA_API_KEY`
+- `SILICONFLOW_API_KEY`
 
-**Flagship vessels**
-
-- [cocapn.ai](https://github.com/Lucineer/capitaine)
-- [personallog.ai](https://github.com/Lucineer/personallog-ai)
-- [businesslog.ai](https://github.com/Lucineer/businesslog-ai)
-- [studylog.ai](https://github.com/Lucineer/studylog-ai)
-- [makerlog.ai](https://github.com/Lucineer/makerlog-ai)
-- [playerlog.ai](https://github.com/Lucineer/playerlog-ai)
-- [dmlog.ai](https://github.com/Lucineer/dmlog-ai)
-- [reallog.ai](https://github.com/Lucineer/reallog-ai)
-- [deckboss.ai](https://github.com/Lucineer/deckboss-ai)
-
-**Fleet services**
-
-- [Fleet Catalog](https://github.com/Lucineer/capitaine/blob/master/docs/fleet/FLEET.md)
-- [Git Agent (full)](https://github.com/Lucineer/git-agent)
-- [Cocapn Lite (minimal)](https://github.com/Lucineer/cocapn-lite)
-- [Fleet Orchestrator](https://github.com/Lucineer/fleet-orchestrator)
-- [Dead Reckoning Engine](https://github.com/Lucineer/dead-reckoning-engine)
-- [Dream Engine](https://github.com/Lucineer/dream-engine)
-- [Seed UI (5 layers)](https://github.com/Lucineer/seed-ui)
-
-**For power users**
-
-- [Cocapn Lite (tabula rasa)](https://github.com/Lucineer/cocapn-lite)
-- [Cocapn (core platform)](https://github.com/Lucineer/cocapn)
-- [ZeroClaw (framework)](https://github.com/Lucineer/zeroclaw)
-
-[View all 106 repos →](https://github.com/orgs/Lucineer/repositories)
-[Fleet manifest →](https://github.com/Lucineer/capitaine/blob/master/docs/fleet/FLEET.md)
-
-</details>
-
+## Contributing
+This is an open fleet vessel. Fork the repository, make your improvements, and submit a pull request to share changes.
 
 ## License
+MIT License © Superinstance & Lucineer (DiGennaro et al.).
 
-MIT · Superinstance & Lucineer (DiGennaro et al.)
+---
+
+<div align="center">
+  <a href="https://the-fleet.casey-digennaro.workers.dev">The Fleet</a> • <a href="https://cocapn.ai">Cocapn</a>
+</div>
